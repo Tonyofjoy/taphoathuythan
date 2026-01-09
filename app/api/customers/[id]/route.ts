@@ -40,3 +40,37 @@ export const GET = withAuth(async (
     );
   }
 });
+
+// DELETE customer (admin only)
+export const DELETE = withAuth(async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+  try {
+    await connectDB();
+
+    const { id } = await params;
+    const customer = await Customer.findById(id);
+
+    if (!customer) {
+      return NextResponse.json(
+        { error: 'Không tìm thấy khách hàng' },
+        { status: 404 }
+      );
+    }
+
+    // Delete the customer
+    await Customer.findByIdAndDelete(id);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Đã xóa khách hàng thành công',
+    });
+  } catch (error) {
+    console.error('Delete customer error:', error);
+    return NextResponse.json(
+      { error: 'Đã xảy ra lỗi khi xóa khách hàng' },
+      { status: 500 }
+    );
+  }
+});

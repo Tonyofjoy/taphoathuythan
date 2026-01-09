@@ -89,12 +89,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Logo */}
           <div className="flex h-16 items-center px-4 sm:px-6 flex-shrink-0">
             <Link href="/admin/dashboard" className="flex items-center space-x-2">
-              <div className="relative h-8 w-8 flex-shrink-0">
+              <div className="relative h-8 w-8 flex-shrink-0 rounded-lg overflow-hidden border-2 border-primary/20">
                 <Image
                   src="/logo.jpg"
                   alt="Tạp Hóa Thủy Thản Logo"
                   fill
-                  className="object-contain"
+                  className="object-cover"
                 />
               </div>
               <span className="text-lg sm:text-xl font-bold text-primary">Tạp Hóa Thủy Thản</span>

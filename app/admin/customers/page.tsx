@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Eye, Plus } from 'lucide-react';
+import { Eye, Plus, KeyRound, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Table,
   TableBody,
@@ -56,10 +66,15 @@ export default function AdminCustomersPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
   const [customerOrders, setCustomerOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [newCustomerData, setNewCustomerData] = useState({
     name: '',
     phone: '',
@@ -160,6 +175,93 @@ export default function AdminCustomersPage() {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (newPassword !== confirmPassword) {
+      toast.error('Mật khẩu xác nhận không khớp');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    if (!selectedCustomer) return;
+
+    setSubmitting(true);
+
+    try {
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(
+        `/api/admin/customers/${selectedCustomer._id}/reset-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ newPassword }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Đã đặt lại mật khẩu thành công');
+        setResetPasswordDialogOpen(false);
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        toast.error(data.error || 'Có lỗi xảy ra');
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi đặt lại mật khẩu');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const openResetPasswordDialog = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setResetPasswordDialogOpen(true);
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const openDeleteAlert = (customer: Customer) => {
+    setCustomerToDelete(customer);
+    setDeleteAlertOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!customerToDelete) return;
+
+    try {
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(`/api/customers/${customerToDelete._id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Đã xóa khách hàng');
+        fetchCustomers();
+        setDeleteAlertOpen(false);
+        setCustomerToDelete(null);
+      } else {
+        toast.error(data.error || 'Có lỗi xảy ra');
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi xóa khách hàng');
+    }
+  };
+
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -223,13 +325,32 @@ export default function AdminCustomersPage() {
                       : 'Chưa có đơn hàng'}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleViewCustomer(customer)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleViewCustomer(customer)}
+                        title="Xem chi tiết"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => openResetPasswordDialog(customer)}
+                        title="Đặt lại mật khẩu"
+                      >
+                        <KeyRound className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => openDeleteAlert(customer)}
+                        title="Xóa khách hàng"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -373,6 +494,85 @@ export default function AdminCustomersPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={resetPasswordDialogOpen} onOpenChange={setResetPasswordDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Đặt lại mật khẩu</DialogTitle>
+            <DialogDescription>
+              Đặt lại mật khẩu cho khách hàng: {selectedCustomer?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword}>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Mật khẩu mới *</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Xác nhận mật khẩu *</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="Nhập lại mật khẩu mới"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-3 text-sm text-yellow-800 dark:text-yellow-200">
+                <p>⚠️ Mật khẩu mới sẽ được thiết lập cho khách hàng này. Hãy thông báo mật khẩu mới cho khách hàng.</p>
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setResetPasswordDialogOpen(false)}
+                disabled={submitting}
+              >
+                Hủy
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Alert */}
+      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Khách hàng <strong>{customerToDelete?.name}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống.
+              <br /><br />
+              <strong>Lưu ý:</strong> Các đơn hàng của khách hàng này sẽ không bị xóa.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Xóa khách hàng
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

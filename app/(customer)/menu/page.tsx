@@ -141,7 +141,7 @@ function MenuContent() {
         </Tabs>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6">
           {filteredProducts.length === 0 ? (
             <div className="col-span-full text-center py-12">
               <p className="text-muted-foreground text-lg">
@@ -154,13 +154,13 @@ function MenuContent() {
                 key={product._id}
                 className="group overflow-hidden hover:shadow-xl transition-shadow"
               >
-                <div className="relative h-48 bg-muted overflow-hidden">
+                <div className="relative w-full bg-muted overflow-hidden" style={{ aspectRatio: '3/4' }}>
                   {product.images.length > 0 ? (
                     <Image
                       src={product.images[0]}
                       alt={product.name}
                       fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="object-contain transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -173,28 +173,29 @@ function MenuContent() {
                     </Badge>
                   )}
                 </div>
-                <CardContent className="p-4">
-                  <Badge variant="outline" className="mb-2">
+                <CardContent className="p-3">
+                  <Badge variant="outline" className="mb-2 text-xs">
                     {product.category.name}
                   </Badge>
-                  <h3 className="font-semibold text-lg mb-1 line-clamp-1">
+                  <h3 className="font-semibold text-sm mb-1 line-clamp-1">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
                     {product.description}
                   </p>
-                  <p className="text-xl font-bold text-primary">
+                  <p className="text-lg font-bold text-primary">
                     {formatPrice(product.price)}
                   </p>
                 </CardContent>
-                <CardFooter className="p-4 pt-0">
+                <CardFooter className="p-3 pt-0">
                   <Button
                     className="w-full"
+                    size="sm"
                     onClick={() => handleAddToCart(product)}
                     disabled={product.status !== 'available'}
                   >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    {product.status === 'available' ? 'Thêm vào giỏ' : 'Hết hàng'}
+                    <ShoppingCart className="mr-2 h-3 w-3" />
+                    {product.status === 'available' ? 'Thêm' : 'Hết hàng'}
                   </Button>
                 </CardFooter>
               </Card>

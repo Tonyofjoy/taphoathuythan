@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/lib/models/Product';
+import Category from '@/lib/models/Category';
 import { withAuth } from '@/lib/middleware';
 
 // GET all products (public)

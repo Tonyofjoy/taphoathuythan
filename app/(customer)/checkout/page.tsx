@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,11 +20,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useCart } from '@/lib/cart-context';
+import { useCustomerAuth } from '@/lib/customer-auth-context';
 import { toast } from 'sonner';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, getCartTotal, clearCart } = useCart();
+  const { customer, isAuthenticated } = useCustomerAuth();
   const [loading, setLoading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
@@ -36,6 +38,20 @@ export default function CheckoutPage() {
     customerNote: '',
     paymentMethod: 'cod' as 'cod' | 'momo' | 'vnpay' | 'zalopay',
   });
+
+  // Prefill customer information if logged in
+  useEffect(() => {
+    if (isAuthenticated && customer) {
+      setFormData(prev => ({
+        ...prev,
+        customerName: customer.name || prev.customerName,
+        customerPhone: customer.phone || prev.customerPhone,
+        customerAddress: customer.addresses && customer.addresses.length > 0 
+          ? customer.addresses[0] 
+          : prev.customerAddress,
+      }));
+    }
+  }, [isAuthenticated, customer]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -111,6 +127,11 @@ export default function CheckoutPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">Thông tin giao hàng</CardTitle>
+              {isAuthenticated && (
+                <p className="text-sm text-muted-foreground">
+                  Thông tin đã được điền tự động từ tài khoản của bạn
+                </p>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,6 +166,25 @@ export default function CheckoutPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="address" className="text-sm">Địa chỉ giao hàng *</Label>
+                  {isAuthenticated && customer && customer.addresses && customer.addresses.length > 1 && (
+                    <Select
+                      value={formData.customerAddress}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, customerAddress: value })
+                      }
+                    >
+                      <SelectTrigger className="text-base mb-2">
+                        <SelectValue placeholder="Chọn địa chỉ đã lưu" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {customer.addresses.map((address, index) => (
+                          <SelectItem key={index} value={address}>
+                            {address}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                   <Textarea
                     id="address"
                     placeholder="Nhập địa chỉ chi tiết"
@@ -216,7 +256,7 @@ export default function CheckoutPage() {
                           src={item.image}
                           alt={item.productName}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">

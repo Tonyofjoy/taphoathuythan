@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface ICustomer extends Document {
   name: string;
   phone: string;
+  password: string;
   addresses: string[];
   totalOrders: number;
   lastOrderAt: Date;
@@ -22,6 +23,11 @@ const CustomerSchema = new Schema<ICustomer>(
       required: [true, 'Vui lòng nhập số điện thoại'],
       unique: true,
       trim: true,
+    },
+    password: {
+      type: String,
+      required: false, // Optional for backward compatibility with existing orders
+      select: false, // Don't include password in queries by default
     },
     addresses: {
       type: [String],

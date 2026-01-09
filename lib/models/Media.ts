@@ -4,6 +4,7 @@ export interface IMedia {
   url: string;
   filename: string;
   size: number;
+  folder: string;
   uploadedAt: Date;
 }
 
@@ -19,6 +20,10 @@ const MediaSchema = new Schema<IMedia>({
   size: {
     type: Number,
     required: true,
+  },
+  folder: {
+    type: String,
+    default: 'general',
   },
   uploadedAt: {
     type: Date,

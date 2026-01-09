@@ -16,7 +16,13 @@ export async function GET(request: NextRequest) {
     }
 
     await connectDB();
-    const media = await Media.find().sort({ uploadedAt: -1 });
+    
+    // Get folder filter from query params
+    const { searchParams } = new URL(request.url);
+    const folder = searchParams.get('folder');
+    
+    const query = folder ? { folder } : {};
+    const media = await Media.find(query).sort({ uploadedAt: -1 });
 
     return NextResponse.json({
       success: true,
@@ -44,6 +50,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const folder = formData.get('folder') as string || 'general';
 
     if (!file) {
       return NextResponse.json(
@@ -52,8 +59,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload to Vercel Blob
-    const blob = await put(file.name, file, {
+    // Upload to Vercel Blob with folder prefix
+    const blobPath = folder !== 'general' ? `${folder}/${file.name}` : file.name;
+    const blob = await put(blobPath, file, {
       access: 'public',
     });
 
@@ -63,6 +71,7 @@ export async function POST(request: NextRequest) {
       url: blob.url,
       filename: file.name,
       size: file.size,
+      folder: folder,
       uploadedAt: new Date(),
     });
 

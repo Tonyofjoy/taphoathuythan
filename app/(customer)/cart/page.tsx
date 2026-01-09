@@ -71,7 +71,7 @@ export default function CartPage() {
                         src={item.image}
                         alt={item.productName}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">

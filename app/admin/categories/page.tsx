@@ -14,6 +14,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Table,
   TableBody,
   TableCell,
@@ -34,7 +44,9 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '', slug: '', order: 0 });
   const [submitting, setSubmitting] = useState(false);
 
@@ -109,8 +121,6 @@ export default function AdminCategoriesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa danh mục này?')) return;
-
     try {
       const response = await fetch(`/api/categories/${id}`, {
         method: 'DELETE',
@@ -122,12 +132,19 @@ export default function AdminCategoriesPage() {
       if (data.success) {
         toast.success('Đã xóa danh mục');
         fetchCategories();
+        setDeleteAlertOpen(false);
+        setCategoryToDelete(null);
       } else {
         toast.error(data.error || 'Có lỗi xảy ra');
       }
     } catch (error) {
       toast.error('Có lỗi xảy ra');
     }
+  };
+
+  const openDeleteAlert = (category: Category) => {
+    setCategoryToDelete(category);
+    setDeleteAlertOpen(true);
   };
 
   const handleAddNew = () => {
@@ -188,7 +205,7 @@ export default function AdminCategoriesPage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => handleDelete(category._id)}
+                        onClick={() => openDeleteAlert(category)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -262,6 +279,27 @@ export default function AdminCategoriesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Alert */}
+      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Danh mục <strong>{categoryToDelete?.name}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => categoryToDelete && handleDelete(categoryToDelete._id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Xóa danh mục
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

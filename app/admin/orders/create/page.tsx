@@ -228,7 +228,7 @@ export default function CreateOrderPage() {
                               src={item.image}
                               alt={item.productName}
                               fill
-                              className="object-cover"
+                              className="object-contain"
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
@@ -238,7 +238,7 @@ export default function CreateOrderPage() {
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold">{item.productName}</h3>
-                          <p className="text-sm text-primary">{formatPrice(item.price)}</p>
+                          <p className="text-sm text-primary">{formatPrice(item.price)} / phần</p>
                           <div className="flex items-center gap-2 mt-2">
                             <Button
                               type="button"
@@ -417,13 +417,13 @@ export default function CreateOrderPage() {
                     setProductDialogOpen(false);
                   }}
                 >
-                  <div className="relative h-32 bg-muted">
+                  <div className="relative w-full bg-muted" style={{ aspectRatio: '3/4' }}>
                     {product.images.length > 0 ? (
                       <Image
                         src={product.images[0]}
                         alt={product.name}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
@@ -435,7 +435,7 @@ export default function CreateOrderPage() {
                     <h3 className="font-semibold text-sm line-clamp-1">{product.name}</h3>
                     <p className="text-xs text-muted-foreground">{product.category.name}</p>
                     <p className="text-sm font-bold text-primary mt-1">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.price)} / phần
                     </p>
                   </CardContent>
                 </Card>

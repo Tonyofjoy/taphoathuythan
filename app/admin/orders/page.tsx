@@ -20,6 +20,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Table,
   TableBody,
   TableCell,
@@ -72,7 +82,9 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
@@ -131,8 +143,6 @@ export default function AdminOrdersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa đơn hàng này?')) return;
-
     try {
       const response = await fetch(`/api/orders/${id}`, {
         method: 'DELETE',
@@ -144,13 +154,19 @@ export default function AdminOrdersPage() {
       if (data.success) {
         toast.success('Đã xóa đơn hàng');
         fetchOrders();
-        setDialogOpen(false);
+        setDeleteAlertOpen(false);
+        setOrderToDelete(null);
       } else {
         toast.error(data.error || 'Có lỗi xảy ra');
       }
     } catch (error) {
       toast.error('Có lỗi xảy ra');
     }
+  };
+
+  const openDeleteAlert = (order: Order) => {
+    setOrderToDelete(order);
+    setDeleteAlertOpen(true);
   };
 
   const formatPrice = (price: number) => {
@@ -265,9 +281,9 @@ export default function AdminOrdersPage() {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => handleDelete(order._id)}
+                              onClick={() => openDeleteAlert(order)}
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </div>
                         </TableCell>
@@ -369,6 +385,27 @@ export default function AdminOrdersPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Alert */}
+      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Đơn hàng <strong>#{orderToDelete?.orderNumber}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => orderToDelete && handleDelete(orderToDelete._id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Xóa đơn hàng
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

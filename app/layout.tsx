@@ -48,6 +48,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  icons: {
+    icon: [
+      { url: '/logo.jpg', type: 'image/jpeg' },
+    ],
+    apple: [
+      { url: '/logo.jpg', type: 'image/jpeg' },
+    ],
+  },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   alternates: {
     canonical: '/',
@@ -71,7 +79,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Tạp Hóa Thủy Thản - Đặt Món Ăn Online',
-    description: 'Đặt món ăn online nhanh chóng, tiện lợi. Thực đơn đa dạng, tươi ngon mỗi ngày.',
+    description: 'Đặt món ăn online nhanh chóng, tiện lợi. Thực đọn đa dạng, tươi ngon mỗi ngày.',
     images: ['/og-image.png'],
   },
   robots: {

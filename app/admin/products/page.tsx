@@ -24,6 +24,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Table,
   TableBody,
   TableCell,
@@ -61,7 +71,9 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -167,8 +179,6 @@ export default function AdminProductsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
-
     try {
       const response = await fetch(`/api/products/${id}`, {
         method: 'DELETE',
@@ -180,12 +190,19 @@ export default function AdminProductsPage() {
       if (data.success) {
         toast.success('Đã xóa sản phẩm');
         fetchData();
+        setDeleteAlertOpen(false);
+        setProductToDelete(null);
       } else {
         toast.error(data.error || 'Có lỗi xảy ra');
       }
     } catch (error) {
       toast.error('Có lỗi xảy ra');
     }
+  };
+
+  const openDeleteAlert = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteAlertOpen(true);
   };
 
   const resetForm = () => {
@@ -260,7 +277,7 @@ export default function AdminProductsPage() {
                             src={product.images[0]}
                             alt={product.name}
                             fill
-                            className="object-cover"
+                            className="object-contain"
                           />
                         </div>
                       ) : (
@@ -289,7 +306,7 @@ export default function AdminProductsPage() {
                           variant="outline"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => openDeleteAlert(product)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -405,7 +422,7 @@ export default function AdminProductsPage() {
                         src={url}
                         alt={`Product ${index + 1}`}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                       />
                       <button
                         type="button"
@@ -456,6 +473,27 @@ export default function AdminProductsPage() {
         multiple={true}
         maxSelection={5}
       />
+
+      {/* Delete Confirmation Alert */}
+      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Sản phẩm <strong>{productToDelete?.name}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => productToDelete && handleDelete(productToDelete._id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Xóa sản phẩm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

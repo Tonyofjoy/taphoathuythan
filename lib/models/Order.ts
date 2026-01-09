@@ -60,7 +60,7 @@ const OrderSchema = new Schema<IOrder>(
   {
     orderNumber: {
       type: String,
-      required: true,
+      required: false,
       unique: true,
     },
     customerName: {
@@ -114,7 +114,7 @@ const OrderSchema = new Schema<IOrder>(
 
 // Generate order number automatically
 OrderSchema.pre('save', async function () {
-  if (this.isNew) {
+  if (this.isNew && !this.orderNumber) {
     const count = await mongoose.models.Order.countDocuments();
     const date = new Date();
     const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
