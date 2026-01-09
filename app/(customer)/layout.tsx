@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,8 +21,14 @@ export default function CustomerLayout({
       <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-xl">
-              T
+            <div className="relative h-10 w-10 flex-shrink-0 rounded-lg overflow-hidden border-2 border-primary/20">
+              <Image
+                src="/logo.jpg"
+                alt="Tạp Hóa Thủy Thản Logo"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
             <span className="text-xl sm:text-2xl font-bold text-primary hidden xs:inline">Tạp Hóa Thủy Thản</span>
           </Link>
@@ -64,8 +71,13 @@ export default function CustomerLayout({
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-                T
+              <div className="relative h-8 w-8 flex-shrink-0 rounded-lg overflow-hidden border-2 border-primary/20">
+                <Image
+                  src="/logo.jpg"
+                  alt="Tạp Hóa Thủy Thản Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <span className="text-lg font-bold text-primary">Tạp Hóa Thủy Thản</span>
             </div>

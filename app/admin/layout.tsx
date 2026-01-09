@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutDashboard,
   Package,
@@ -11,7 +12,7 @@ import {
   Users,
   LogOut,
   Menu,
-  Image,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -27,7 +28,7 @@ const menuItems = [
   { href: '/admin/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
   { href: '/admin/categories', label: 'Danh mục', icon: FolderTree },
   { href: '/admin/products', label: 'Sản phẩm', icon: Package },
-  { href: '/admin/media', label: 'Thư viện Media', icon: Image },
+  { href: '/admin/media', label: 'Thư viện Media', icon: ImageIcon },
   { href: '/admin/orders', label: 'Đơn hàng', icon: ShoppingCart },
   { href: '/admin/customers', label: 'Khách hàng', icon: Users },
 ];
@@ -88,8 +89,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Logo */}
           <div className="flex h-16 items-center px-4 sm:px-6 flex-shrink-0">
             <Link href="/admin/dashboard" className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-                T
+              <div className="relative h-8 w-8 flex-shrink-0">
+                <Image
+                  src="/logo.jpg"
+                  alt="Tạp Hóa Thủy Thản Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <span className="text-lg sm:text-xl font-bold text-primary">Tạp Hóa Thủy Thản</span>
             </Link>
