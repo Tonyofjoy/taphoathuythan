@@ -7,7 +7,7 @@ import { del } from '@vercel/blob';
 // DELETE - Delete media
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = await verifyAuth(request);
@@ -18,8 +18,9 @@ export async function DELETE(
       );
     }
 
+    const { id } = await params;
     await connectDB();
-    const media = await Media.findById(params.id);
+    const media = await Media.findById(id);
 
     if (!media) {
       return NextResponse.json(
@@ -37,7 +38,7 @@ export async function DELETE(
     }
 
     // Delete from database
-    await Media.findByIdAndDelete(params.id);
+    await Media.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,
