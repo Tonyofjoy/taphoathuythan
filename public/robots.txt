@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /menu
+Allow: /cart
+Allow: /checkout
+
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://taphoathuythan.xyz/sitemap.xml
