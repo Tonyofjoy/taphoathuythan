@@ -164,11 +164,7 @@ export default function MediaManagementPage() {
             Thư viện hình ảnh và media của cửa hàng
           </p>
         </div>
-        <label className="w-full sm:w-auto">
-          <Button disabled={uploading} className="w-full sm:w-auto cursor-pointer">
-            <Upload className="mr-2 h-4 w-4" />
-            {uploading ? 'Đang upload...' : 'Upload Media'}
-          </Button>
+        <div className="w-full sm:w-auto">
           <input
             type="file"
             multiple
@@ -176,8 +172,17 @@ export default function MediaManagementPage() {
             onChange={handleFileUpload}
             className="hidden"
             disabled={uploading}
+            id="media-upload-input"
           />
-        </label>
+          <label htmlFor="media-upload-input">
+            <Button disabled={uploading} className="w-full sm:w-auto cursor-pointer" asChild>
+              <span>
+                <Upload className="mr-2 h-4 w-4" />
+                {uploading ? 'Đang upload...' : 'Upload Media'}
+              </span>
+            </Button>
+          </label>
+        </div>
       </div>
 
       {/* Search */}
@@ -211,11 +216,7 @@ export default function MediaManagementPage() {
               {searchQuery ? 'Không tìm thấy kết quả' : 'Hãy upload media đầu tiên'}
             </p>
             {!searchQuery && (
-              <label>
-                <Button variant="outline" className="cursor-pointer">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload Media
-                </Button>
+              <div>
                 <input
                   type="file"
                   multiple
@@ -223,8 +224,17 @@ export default function MediaManagementPage() {
                   onChange={handleFileUpload}
                   className="hidden"
                   disabled={uploading}
+                  id="media-upload-input-empty"
                 />
-              </label>
+                <label htmlFor="media-upload-input-empty">
+                  <Button variant="outline" className="cursor-pointer" asChild>
+                    <span>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Media
+                    </span>
+                  </Button>
+                </label>
+              </div>
             )}
           </CardContent>
         </Card>
