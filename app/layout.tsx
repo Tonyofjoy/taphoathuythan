@@ -69,10 +69,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: '/about.jpg',
         width: 1200,
         height: 630,
-        alt: 'Tạp Hóa Thủy Thản',
+        alt: 'Tạp Hóa Thủy Thản - Món ăn gia đình',
       },
     ],
   },
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Tạp Hóa Thủy Thản - Đặt Món Ăn Online',
     description: 'Đặt món ăn online nhanh chóng, tiện lợi. Thực đọn đa dạng, tươi ngon mỗi ngày.',
-    images: ['/og-image.png'],
+    images: ['/about.jpg'],
   },
   robots: {
     index: true,
